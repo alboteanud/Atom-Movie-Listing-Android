@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Atom Movie Listing</string>
+    <string name="title_item_detail">Item Detail</string>
+    <string name="tmdb_api_key">8700e0b55b9438b27963771c2aff54f5</string>
+</resources>
