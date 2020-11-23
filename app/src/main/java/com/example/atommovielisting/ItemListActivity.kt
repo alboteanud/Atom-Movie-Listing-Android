@@ -20,6 +20,7 @@ import com.example.atommovielisting.model.FeedEntry
 import com.example.atommovielisting.ui.MyViewModel
 import com.example.atommovielisting.utilities.InjectorUtils
 import com.example.atommovielisting.utilities.LogUtils.log
+import java.util.ArrayList
 
 /**
  * An activity representing a list of Pings. This activity
@@ -63,7 +64,7 @@ class ItemListActivity : AppCompatActivity() {
             twoPane = true
         }
 
-        setupRecyclerView(findViewById(R.id.item_list))
+//        setupRecyclerView(findViewById(R.id.item_list), entries)
 
         val factory = InjectorUtils.provideMainActivityViewModelFactory(this.applicationContext)
         myViewModel = ViewModelProvider(this@ItemListActivity, factory).get(MyViewModel::class.java)
@@ -82,17 +83,23 @@ class ItemListActivity : AppCompatActivity() {
 
     fun getMovies(){
         val networkDataSource = InjectorUtils.provideNetworkDataSource(this.applicationContext)
-        networkDataSource.fetchMovies {
-log("feed entry received" + it?.size)
+        networkDataSource.fetchMovies {entries ->
+//log("feed entry received" + entries?.size)
+//            val ITEMS: MutableList<DummyContent2.DummyItem> = ArrayList()
+            entries?.let {
+                setupRecyclerView(findViewById(R.id.item_list), entries)
+            }
+
         }
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent2.ITEMS, twoPane)
+    private fun setupRecyclerView(recyclerView: RecyclerView, entries: Array<FeedEntry>) {
+        mAdapter = SimpleItemRecyclerViewAdapter(this, entries.toList(), twoPane)
+        recyclerView.adapter = mAdapter
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val values: List<DummyContent2.DummyItem>,
+                                        private val values: List<FeedEntry>,
                                         private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
@@ -128,8 +135,8 @@ log("feed entry received" + it?.size)
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            holder.idView.text = item.id
-            holder.contentView.text = item.title
+            holder.idView.text = item.title
+//            holder.contentView.text = item.overview
 
             with(holder.itemView) {
                 tag = item
