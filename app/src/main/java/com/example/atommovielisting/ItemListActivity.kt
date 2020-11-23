@@ -12,8 +12,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 
 import com.example.atommovielisting.dummy.DummyContent
+import com.example.atommovielisting.dummy.DummyContent2
+import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.ui.MyViewModel
+import com.example.atommovielisting.utilities.InjectorUtils
+import com.example.atommovielisting.utilities.LogUtils.log
 
 /**
  * An activity representing a list of Pings. This activity
@@ -30,6 +36,9 @@ class ItemListActivity : AppCompatActivity() {
      * device.
      */
     private var twoPane: Boolean = false
+    private lateinit var myViewModel: MyViewModel
+    private var listEntries: Array<FeedEntry>? = null
+    private lateinit var mAdapter: SimpleItemRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +53,8 @@ class ItemListActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
         }
 
+        getMovies()
+
         if (findViewById<NestedScrollView>(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -53,14 +64,35 @@ class ItemListActivity : AppCompatActivity() {
         }
 
         setupRecyclerView(findViewById(R.id.item_list))
+
+        val factory = InjectorUtils.provideMainActivityViewModelFactory(this.applicationContext)
+        myViewModel = ViewModelProvider(this@ItemListActivity, factory).get(MyViewModel::class.java)
+
+        observeEntries(myViewModel)
+    }
+
+    private fun observeEntries(myViewModel: MyViewModel) {
+        myViewModel.entries.observe(this, androidx.lifecycle.Observer { listEntries ->
+            if (listEntries.isNullOrEmpty()) return@Observer
+            this.listEntries = listEntries
+//            updateAdapter()
+        })
+    }
+
+
+    fun getMovies(){
+        val networkDataSource = InjectorUtils.provideNetworkDataSource(this.applicationContext)
+        networkDataSource.fetchMovies {
+log("feed entry received" + it?.size)
+        }
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, twoPane)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent2.ITEMS, twoPane)
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val values: List<DummyContent.DummyItem>,
+                                        private val values: List<DummyContent2.DummyItem>,
                                         private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
@@ -97,7 +129,7 @@ class ItemListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
             holder.idView.text = item.id
-            holder.contentView.text = item.content
+            holder.contentView.text = item.title
 
             with(holder.itemView) {
                 tag = item
