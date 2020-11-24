@@ -15,22 +15,20 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 
 import com.example.atommovielisting.dummy.DummyContent
-import com.example.atommovielisting.dummy.DummyContent2
 import com.example.atommovielisting.model.FeedEntry
 import com.example.atommovielisting.ui.MyViewModel
 import com.example.atommovielisting.utilities.InjectorUtils
 import com.example.atommovielisting.utilities.LogUtils.log
-import java.util.ArrayList
 
 /**
  * An activity representing a list of Pings. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a [ItemDetailActivity] representing
+ * lead to a [DetailActivity] representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-class ItemListActivity : AppCompatActivity() {
+class ListActivity : AppCompatActivity() {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -38,7 +36,7 @@ class ItemListActivity : AppCompatActivity() {
      */
     private var twoPane: Boolean = false
     private lateinit var myViewModel: MyViewModel
-    private var listEntries: Array<FeedEntry>? = null
+    private var listEntries: List<FeedEntry>? = null
     private lateinit var mAdapter: SimpleItemRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +52,6 @@ class ItemListActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
         }
 
-        getMovies()
-
         if (findViewById<NestedScrollView>(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -64,11 +60,10 @@ class ItemListActivity : AppCompatActivity() {
             twoPane = true
         }
 
-//        setupRecyclerView(findViewById(R.id.item_list), entries)
-
         val factory = InjectorUtils.provideMainActivityViewModelFactory(this.applicationContext)
-        myViewModel = ViewModelProvider(this@ItemListActivity, factory).get(MyViewModel::class.java)
+        myViewModel = ViewModelProvider(this@ListActivity, factory).get(MyViewModel::class.java)
 
+        setupRecyclerView(findViewById(R.id.item_list))
         observeEntries(myViewModel)
     }
 
@@ -77,41 +72,32 @@ class ItemListActivity : AppCompatActivity() {
             if (listEntries.isNullOrEmpty()) return@Observer
             this.listEntries = listEntries
 //            updateAdapter()
+
+            mAdapter.values = listEntries
+            mAdapter.notifyDataSetChanged()
+
         })
     }
 
-
-    fun getMovies(){
-        val networkDataSource = InjectorUtils.provideNetworkDataSource(this.applicationContext)
-        networkDataSource.fetchMovies {entries ->
-//log("feed entry received" + entries?.size)
-//            val ITEMS: MutableList<DummyContent2.DummyItem> = ArrayList()
-            entries?.let {
-                setupRecyclerView(findViewById(R.id.item_list), entries)
-            }
-
-        }
-    }
-
-    private fun setupRecyclerView(recyclerView: RecyclerView, entries: Array<FeedEntry>) {
-        mAdapter = SimpleItemRecyclerViewAdapter(this, entries.toList(), twoPane)
+    private fun setupRecyclerView(recyclerView: RecyclerView) {
+        mAdapter = SimpleItemRecyclerViewAdapter(this,  twoPane)
         recyclerView.adapter = mAdapter
+
     }
 
-    class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val values: List<FeedEntry>,
-                                        private val twoPane: Boolean) :
+    class SimpleItemRecyclerViewAdapter(private val parentActivity: ListActivity, private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
+        var values: List<FeedEntry> = listOf()
         private val onClickListener: View.OnClickListener
 
         init {
             onClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
+                val item = v.tag as FeedEntry
                 if (twoPane) {
-                    val fragment = ItemDetailFragment().apply {
+                    val fragment = DetailFragment().apply {
                         arguments = Bundle().apply {
-                            putString(ItemDetailFragment.ARG_ITEM_ID, item.id)
+                            putString(DetailFragment.ARG_ITEM_ID, item.id.toString())
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -119,8 +105,8 @@ class ItemListActivity : AppCompatActivity() {
                             .replace(R.id.item_detail_container, fragment)
                             .commit()
                 } else {
-                    val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
+                    val intent = Intent(v.context, DetailActivity::class.java).apply {
+                        putExtra(DetailFragment.ARG_ITEM_ID, item.id.toString())
                     }
                     v.context.startActivity(intent)
                 }

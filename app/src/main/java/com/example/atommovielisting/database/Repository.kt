@@ -1,11 +1,13 @@
 package com.example.atommovielisting.database
 
+import android.text.format.DateUtils.DAY_IN_MILLIS
 import android.text.format.DateUtils.HOUR_IN_MILLIS
 import androidx.lifecycle.LiveData
 import com.example.atommovielisting.model.FeedEntry
 import com.example.atommovielisting.utilities.LogUtils.log
 import com.example.atommovielisting.network.NetworkDataSource
 import com.example.atommovielisting.utilities.AppExecutors
+import com.example.atommovielisting.utilities.LogUtils.inTestMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -14,26 +16,26 @@ import java.util.*
 
 /**
  * Handles data operations. Acts as a mediator between [NetworkDataSource]
- * and [WeatherDao]
+ * and [MyDao]
  */
 class Repository private constructor(
         private val mDao: MyDao,
         private val mNetworkDataSource: NetworkDataSource,
         private val mExecutors: AppExecutors
 ) {
-    private var initializedForecast = false
+    private var initializedEntries = false
 
     init {
 
         GlobalScope.launch(Dispatchers.Main) {
 
-            mNetworkDataSource.forecasts.observeForever { newForecastsFromNetwork ->
+            mNetworkDataSource.entries.observeForever { newForecastsFromNetwork ->
                 mExecutors.diskIO().execute {
                     // Deletes old historical data
-                    deleteOldWeatherData()
+                    deleteOldEntries()
                     // Insert our new weather data into Sunshine's database
-                    mDao.bulkInsert(*newForecastsFromNetwork)
-                    log( "Old data deleted. New values inserted.")
+                    mDao.insertEntries(newForecastsFromNetwork)
+                    log( "Old entries deleted. New values inserted.")
                 }
             }
 
@@ -41,18 +43,16 @@ class Repository private constructor(
 
     }
 
-
     /**
      * Checks if there are enough days of future weather for the app to display all the needed data.
      *
      * @return Whether a fetch is needed
      */
-    private val isFetchForecastNeeded: Boolean
+    private val isFetchEntriesNeeded: Boolean
         get() {
-//            val now = Date(currentTimeMillis())
-//            val count = mWeatherDao.countAllFutureWeatherEntries(now)
-//            return count < NetworkDataSource.NUM_MIN_DATA_COUNTS
-            return true
+            val entrieCount = mDao.countAllEntries()
+            log("stored entries count: $entrieCount")
+            return entrieCount < NUM_MIN_ENTRIES_COUNTS
         }
 
 
@@ -60,61 +60,54 @@ class Repository private constructor(
      * immediate sync is required, this method will take care of making sure that sync occurs.
      */
     @Synchronized
-    fun initializeForecastData() {
+    fun initializeEntries() {
 
         // Only perform initialization once per app lifetime. If initialization has already been
         // performed, we have nothing to do in this method.
-        if (initializedForecast) return
-        initializedForecast = true
+        if (initializedEntries) return
+        initializedEntries = true
 
+//        mNetworkDataSource.scheduleFetchEntries()
 
-//            // java.lang.IllegalStateException: Cannot access database on the main thread since it may potentially lock the UI for a long period of time.
         mExecutors.diskIO().execute {
-            if (!isFetchForecastNeeded) return@execute
-            mNetworkDataSource.fetchMovies { firstWeatherEntry ->
-                if (firstWeatherEntry != null){
-//                    initializeWebcamData(firstWeatherEntry)
+            if (!isFetchEntriesNeeded) return@execute
+            mNetworkDataSource.downloadEntries { firstEntry ->
+                if (firstEntry != null){
+//                    initializeWebcamData(firstEntry)
                 }
-
             }
         }
     }
 
-
-    val allEntries: LiveData<Array<FeedEntry>>
+    val allEntries: LiveData<List<FeedEntry>>
         get() {
-            initializeForecastData()
-
-
-            return mDao.loadAllEntries()
+            initializeEntries()
+            return mDao.getAllEntries()
         }
 
-
-    private fun deleteOldWeatherData() {
-        //        Date today = SunshineDateUtils.getNormalizedUtcDateForToday();
-        val oldTime = currentTimeMillis() - HOUR_IN_MILLIS
-        val date = Date(oldTime)
-//        mWeatherDao.deleteOldWeather(date)
+    private fun deleteOldEntries() {
+        val oldMills = currentTimeMillis() - OLD_DAYS_COUNT * DAY_IN_MILLIS
+        val oldDate = Date(oldMills)
+        mDao.deleteOldEntries(oldDate)
     }
 
-
     companion object {
-
-        // For Singleton instantiation
+        private val OLD_DAYS_COUNT = 30
         private val LOCK = Any()
         private var sInstance: Repository? = null
+        private val NUM_MIN_ENTRIES_COUNTS = if (inTestMode) 1 else 20
 
         @Synchronized
         fun getInstance(
-                weatherDao: MyDao, networkDataSource: NetworkDataSource,
-                executors: AppExecutors
+            myDao: MyDao, networkDataSource: NetworkDataSource,
+            executors: AppExecutors
         ): Repository {
             log("Getting the repository")
             if (sInstance == null) {
                 synchronized(LOCK) {
                     sInstance =
                             Repository(
-                                    weatherDao, networkDataSource,
+                                    myDao, networkDataSource,
                                     executors
                             )
                     log("Made new repository")

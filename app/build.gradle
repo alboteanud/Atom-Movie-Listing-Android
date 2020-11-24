@@ -2,17 +2,17 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'kotlin-android-extensions'
+//    id 'kotlin-android-extensions'
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+//    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.example.atommovielisting"
-        minSdkVersion 16
-        targetSdkVersion 29
+        minSdkVersion 26
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         javaCompileOptions {
@@ -44,7 +44,7 @@ android {
 
 ext.work_version = "2.4.0"
 ext.arch_version = '2.2.0'
-ext.junit_version = '4.13'
+ext.junit_version = '4.13.1'
 ext.support_test_version = '1.2.0'
 ext.glide_version = '4.11.0'
 
@@ -60,7 +60,7 @@ dependencies {
     kapt "androidx.room:room-compiler:2.2.5"
 
     implementation "androidx.work:work-runtime-ktx:$work_version"
-    implementation "androidx.lifecycle:lifecycle-runtime:$arch_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$arch_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$arch_version"
 
     androidTestImplementation "junit:junit:$junit_version"
