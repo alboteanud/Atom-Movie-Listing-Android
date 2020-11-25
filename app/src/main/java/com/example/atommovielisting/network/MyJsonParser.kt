@@ -1,18 +1,20 @@
 package com.example.atommovielisting.network
-import com.example.atommovielisting.model.Movie
+import com.example.atommovielisting.model.FeedEntry
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.HttpURLConnection
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 
-internal class ServerResponse (val entries: Array<Movie>)
+internal class ServerResponse (val entries: List<FeedEntry>?)
 
 internal class MyJsonParser {
 
     @Throws(JSONException::class)
     fun parseForecastWeather(jsonObject: JSONObject): ServerResponse {
-
         if (hasHttpError(jsonObject)) {
-            return ServerResponse(emptyArray())
+            return ServerResponse(null)
         }
         val weatherForecast = fromJsonForecast(jsonObject)
         return ServerResponse(weatherForecast)
@@ -28,8 +30,7 @@ internal class MyJsonParser {
             if (forecastJson.has(MESSAGE_CODE)) {
                 return when (forecastJson.getInt(MESSAGE_CODE)) {
                     HttpURLConnection.HTTP_OK -> false
-                    HttpURLConnection.HTTP_NOT_FOUND ->  // Server probably down
-                        true
+                    HttpURLConnection.HTTP_NOT_FOUND ->  true // Server probably down
                     else -> true
                 }
             }
@@ -37,25 +38,29 @@ internal class MyJsonParser {
         }
 
         @Throws(JSONException::class)
-        private fun fromJsonForecast(forecastJson: JSONObject): Array<Movie> {
+        private fun fromJsonForecast(forecastJson: JSONObject): List<FeedEntry> {
             val jsonResultArray = forecastJson.getJSONArray(RESULTS)
-            val entries = mutableListOf<Movie>()
-            for (i in 0 until jsonResultArray.length()) { // Get the JSON object representing one entry
+            val entries = mutableListOf<FeedEntry>()
+            for (i in 0 until jsonResultArray.length()) {
                 val entryJson = jsonResultArray.getJSONObject(i)
                 val entry = fromJsonToEntry(entryJson)
                 entries.add(i, entry)
             }
-            return entries.toTypedArray()
+            return entries.toList()
         }
 
-        private fun fromJsonToEntry(entryJson: JSONObject): Movie {
+
+        private fun fromJsonToEntry(entryJson: JSONObject): FeedEntry {
             val id = entryJson.getInt("id")
             val title = entryJson.getString("title")
             val overview = entryJson.getString("overview")
-            val poster_path = entryJson.getString("poster_path")
+            val posterPath = entryJson.getString("poster_path")
             val popularity = entryJson.getDouble("popularity")
 
-            return Movie(id, title, poster_path, overview, 1, popularity)
+            val releaseDateString = entryJson.getString("release_date")
+//            val releaseDate = LocalDate.parse(releaseDateString, DateTimeFormatter.ISO_DATE)
+           val releaseDate = java.sql.Date.valueOf(releaseDateString)
+            return FeedEntry(id, title, posterPath, overview, popularity, releaseDate)
 
         }
     }

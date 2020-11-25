@@ -11,27 +11,23 @@ import com.example.atommovielisting.ui.ViewModelFactory
  */
 object InjectorUtils {
 
-    fun provideRepository(context: Context): Repository {
+    private fun provideRepository(context: Context): Repository {
         val myDatabase = MyDatabase.getInstance(context.applicationContext)
         val executors = AppExecutors.instance
         val networkDataSource =
-                NetworkDataSource.getInstance(context.applicationContext, executors)
-        //        NetworkDataSource.addTestText(context, "prRep")
+                NetworkDataSource.getInstance(context.applicationContext)
         return Repository.getInstance(
                 myDatabase.moviesDao()!!,
                 networkDataSource,
                 executors)
-
     }
 
     fun provideNetworkDataSource(context: Context): NetworkDataSource {
         // This call to provide repository is necessary if the app starts from a service - in this
 // case the repository will not exist unless it is specifically created.
         provideRepository(context.applicationContext)
-        val executors = AppExecutors.instance
-        val networkDataSource = NetworkDataSource.getInstance(context.applicationContext, executors)
-//        NetworkDataSource.addTestText(context, "prNDS")
-        return networkDataSource
+//        val executors = AppExecutors.instance
+        return NetworkDataSource.getInstance(context.applicationContext)
     }
 
     //    public static DetailViewModelFactory provideDetailViewModelFactory(Context context, Date date) {
