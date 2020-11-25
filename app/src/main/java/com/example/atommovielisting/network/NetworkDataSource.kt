@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.Movie
 import com.example.atommovielisting.utilities.AppExecutors
 import com.example.atommovielisting.utilities.LogUtils.log
 import org.json.JSONException
@@ -17,15 +17,15 @@ import org.json.JSONException
 class NetworkDataSource private constructor(private val context: Context,  private val mExecutors: AppExecutors) {
 
     // LiveData storing the latest downloaded entries
-    private val mDownloadedWeatherForecasts: MutableLiveData<Array<FeedEntry>> =
+    private val mDownloadedWeatherForecasts: MutableLiveData<Array<Movie>> =
         MutableLiveData()
 
-    val forecasts: LiveData<Array<FeedEntry>>
+    val forecasts: LiveData<Array<Movie>>
         get() = mDownloadedWeatherForecasts
 
     private val url = "https://api.themoviedb.org/3/movie/popular?api_key=8700e0b55b9438b27963771c2aff54f5"
 
-    fun fetchMovies(function: (success: Array<FeedEntry>?) -> Unit) {
+    fun fetchMovies(function: (successes: Array<Movie>?) -> Unit) {
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.GET, url, null, { response ->
 //                    val text = "Response: %s".format(response.toString())

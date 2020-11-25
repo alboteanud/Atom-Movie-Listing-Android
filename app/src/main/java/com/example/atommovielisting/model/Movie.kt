@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import java.util.*
 
 @Entity(tableName = "movies", indices = [Index(value = ["id"], unique = true)])
-class FeedEntry(
+class Movie(
     @PrimaryKey var id: Int,
     var title: String?,
     val poster_path: String?,

@@ -1,11 +1,10 @@
 package com.example.atommovielisting.network
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.Movie
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.HttpURLConnection
-import java.util.*
 
-internal class ServerResponse (val entries: Array<FeedEntry>)
+internal class ServerResponse (val entries: Array<Movie>)
 
 internal class MyJsonParser {
 
@@ -38,9 +37,9 @@ internal class MyJsonParser {
         }
 
         @Throws(JSONException::class)
-        private fun fromJsonForecast(forecastJson: JSONObject): Array<FeedEntry> {
+        private fun fromJsonForecast(forecastJson: JSONObject): Array<Movie> {
             val jsonResultArray = forecastJson.getJSONArray(RESULTS)
-            val entries = mutableListOf<FeedEntry>()
+            val entries = mutableListOf<Movie>()
             for (i in 0 until jsonResultArray.length()) { // Get the JSON object representing one entry
                 val entryJson = jsonResultArray.getJSONObject(i)
                 val entry = fromJsonToEntry(entryJson)
@@ -49,14 +48,14 @@ internal class MyJsonParser {
             return entries.toTypedArray()
         }
 
-        private fun fromJsonToEntry(entryJson: JSONObject): FeedEntry {
+        private fun fromJsonToEntry(entryJson: JSONObject): Movie {
             val id = entryJson.getInt("id")
             val title = entryJson.getString("title")
             val overview = entryJson.getString("overview")
             val poster_path = entryJson.getString("poster_path")
             val popularity = entryJson.getDouble("popularity")
 
-            return FeedEntry(id, title, poster_path, overview, 1, popularity)
+            return Movie(id, title, poster_path, overview, 1, popularity)
 
         }
     }

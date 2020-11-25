@@ -2,11 +2,11 @@ package com.example.atommovielisting.ui
 
 import androidx.lifecycle.*
 import com.example.atommovielisting.database.Repository
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.Movie
 
 class MyViewModel internal constructor(private val repository: Repository) : ViewModel(),
         LifecycleObserver {
-    val entries: LiveData<Array<FeedEntry>> = repository.allEntries
+    val entries: LiveData<Array<Movie>> = repository.allEntries
 
 
 

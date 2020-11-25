@@ -1,6 +1,6 @@
 package com.example.atommovielisting.model
 
-class ListEntry(val id: Int, val title: String, val poster_path: String, val overview: String, val page: Int, val popularity: Float, val vote_average: Float) {
+class ListMovie(val id: Int, val title: String, val poster_path: String, val overview: String, val page: Int, val popularity: Float, val vote_average: Float) {
 }
 
 // An extension to create a FeedEntry object from the server representation of an entry.

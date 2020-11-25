@@ -14,13 +14,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 
-import com.example.atommovielisting.dummy.DummyContent
-import com.example.atommovielisting.dummy.DummyContent2
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.DummyContent
+import com.example.atommovielisting.model.Movie
 import com.example.atommovielisting.ui.MyViewModel
 import com.example.atommovielisting.utilities.InjectorUtils
-import com.example.atommovielisting.utilities.LogUtils.log
-import java.util.ArrayList
 
 /**
  * An activity representing a list of Pings. This activity
@@ -38,7 +35,7 @@ class ItemListActivity : AppCompatActivity() {
      */
     private var twoPane: Boolean = false
     private lateinit var myViewModel: MyViewModel
-    private var listEntries: Array<FeedEntry>? = null
+    private var listEntries: Array<Movie>? = null
     private lateinit var mAdapter: SimpleItemRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +78,7 @@ class ItemListActivity : AppCompatActivity() {
     }
 
 
-    fun getMovies(){
+    private fun getMovies(){
         val networkDataSource = InjectorUtils.provideNetworkDataSource(this.applicationContext)
         networkDataSource.fetchMovies {entries ->
 //log("feed entry received" + entries?.size)
@@ -93,13 +90,13 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView, entries: Array<FeedEntry>) {
+    private fun setupRecyclerView(recyclerView: RecyclerView, entries: Array<Movie>) {
         mAdapter = SimpleItemRecyclerViewAdapter(this, entries.toList(), twoPane)
         recyclerView.adapter = mAdapter
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                                        private val values: List<FeedEntry>,
+                                        private val values: List<Movie>,
                                         private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
@@ -136,7 +133,7 @@ class ItemListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
             holder.idView.text = item.title
-//            holder.contentView.text = item.overview
+            holder.contentView.text = item.poster_path
 
             with(holder.itemView) {
                 tag = item

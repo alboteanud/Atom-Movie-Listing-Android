@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.example.atommovielisting.dummy.DummyContent
+import com.example.atommovielisting.model.DummyContent
 
 /**
  * A fragment representing a single Item detail screen.

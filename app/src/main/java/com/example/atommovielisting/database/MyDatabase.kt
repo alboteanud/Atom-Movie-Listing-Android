@@ -7,9 +7,9 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.Movie
 
-@Database(entities = [FeedEntry::class], version = 5, exportSchema = false)
+@Database(entities = [Movie::class], version = 5, exportSchema = false)
 @TypeConverters(
     DateConverter::class
 )

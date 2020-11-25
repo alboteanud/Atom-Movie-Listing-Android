@@ -1,9 +1,5 @@
-package com.example.atommovielisting.dummy
+package com.example.atommovielisting.model
 
-import android.util.Log
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -13,7 +9,7 @@ import java.util.HashMap
  *
  * TODO: Replace all uses of this class before publishing your app.
  */
-object DummyContent2 {
+object DummyContent {
 
     /**
      * An array of sample (dummy) items.
@@ -33,7 +29,6 @@ object DummyContent2 {
             addItem(createDummyItem(i))
         }
     }
-
 
     private fun addItem(item: DummyItem) {
         ITEMS.add(item)
@@ -56,7 +51,7 @@ object DummyContent2 {
     /**
      * A dummy item representing a piece of content.
      */
-    data class DummyItem(val id: String, val title: String, val details: String) {
-        override fun toString(): String = title
+    data class DummyItem(val id: String, val content: String, val details: String) {
+        override fun toString(): String = content
     }
 }
