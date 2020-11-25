@@ -2,23 +2,23 @@ package com.example.atommovielisting
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.widget.NestedScrollView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.Toolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
-
-import com.example.atommovielisting.dummy.DummyContent
-import com.example.atommovielisting.model.FeedEntry
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.atommovielisting.model.Movie
+import com.example.atommovielisting.network.NetworkDataSource.Companion.buildPosterPhotoUrl
 import com.example.atommovielisting.ui.MyViewModel
 import com.example.atommovielisting.utilities.InjectorUtils
-import com.example.atommovielisting.utilities.LogUtils.log
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * An activity representing a list of Pings. This activity
@@ -36,7 +36,7 @@ class ListActivity : AppCompatActivity() {
      */
     private var twoPane: Boolean = false
     private lateinit var myViewModel: MyViewModel
-    private var listEntries: List<FeedEntry>? = null
+    private var listEntries: List<Movie>? = null
     private lateinit var mAdapter: SimpleItemRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +46,8 @@ class ListActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.title = title
+        toolbar.setLogo(R.mipmap.ic_launcher)
+        // todo setup a custom toolbar
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -60,7 +62,8 @@ class ListActivity : AppCompatActivity() {
             twoPane = true
         }
 
-        val factory = InjectorUtils.provideMainActivityViewModelFactory(this.applicationContext)
+        val factory = InjectorUtils.provideListActivityViewModelFactory(this.applicationContext)
+
         myViewModel = ViewModelProvider(this@ListActivity, factory).get(MyViewModel::class.java)
 
         setupRecyclerView(findViewById(R.id.item_list))
@@ -69,10 +72,9 @@ class ListActivity : AppCompatActivity() {
 
     private fun observeEntries(myViewModel: MyViewModel) {
         myViewModel.entries.observe(this, androidx.lifecycle.Observer { listEntries ->
-            if (listEntries.isNullOrEmpty()) return@Observer
+//            if (listEntries.isNullOrEmpty()) return@Observer
             this.listEntries = listEntries
-//            updateAdapter()
-
+//            update all entries Adapter
             mAdapter.values = listEntries
             mAdapter.notifyDataSetChanged()
 
@@ -80,7 +82,7 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        mAdapter = SimpleItemRecyclerViewAdapter(this,  twoPane)
+        mAdapter = SimpleItemRecyclerViewAdapter(this, twoPane)
         recyclerView.adapter = mAdapter
 
     }
@@ -88,16 +90,16 @@ class ListActivity : AppCompatActivity() {
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ListActivity, private val twoPane: Boolean) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
-        var values: List<FeedEntry> = listOf()
+        var values: List<Movie> = listOf()
         private val onClickListener: View.OnClickListener
 
         init {
             onClickListener = View.OnClickListener { v ->
-                val item = v.tag as FeedEntry
+                val item = v.tag as Movie
                 if (twoPane) {
                     val fragment = DetailFragment().apply {
                         arguments = Bundle().apply {
-                            putString(DetailFragment.ARG_ITEM_ID, item.id.toString())
+                            putInt(DetailFragment.ARG_ITEM_ID, item.id)
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -106,7 +108,7 @@ class ListActivity : AppCompatActivity() {
                             .commit()
                 } else {
                     val intent = Intent(v.context, DetailActivity::class.java).apply {
-                        putExtra(DetailFragment.ARG_ITEM_ID, item.id.toString())
+                        putExtra(DetailFragment.ARG_ITEM_ID, item.id)
                     }
                     v.context.startActivity(intent)
                 }
@@ -122,7 +124,12 @@ class ListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
             holder.idView.text = item.title
-//            holder.contentView.text = item.overview
+            holder.contentView.text = item.overview
+
+            item.poster_path?.let {
+                val posterUrl = buildPosterPhotoUrl(item.poster_path)
+                Glide.with(parentActivity).load(posterUrl).into(holder.imageView)
+            }
 
             with(holder.itemView) {
                 tag = item
@@ -135,6 +142,7 @@ class ListActivity : AppCompatActivity() {
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val idView: TextView = view.findViewById(R.id.id_text)
             val contentView: TextView = view.findViewById(R.id.content)
+            val imageView: ImageView = view.findViewById(R.id.myImageView)
         }
     }
 }

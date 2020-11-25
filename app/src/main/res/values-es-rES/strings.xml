@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Listado de películas Atom</string>
+    <string name="title_item_detail">Item Detail</string>
+    <string name="image_description">imagen del cartel de la película</string>
+</resources>

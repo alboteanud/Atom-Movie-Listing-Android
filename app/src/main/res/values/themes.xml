@@ -22,4 +22,11 @@
     <style name="Theme.AtomMovieListing.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.AtomMovieListing.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="SubheadWhiteTextStyle" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+
+    </style>
 </resources>

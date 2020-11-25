@@ -1,9 +1,8 @@
 package com.example.atommovielisting.database
 
 import android.text.format.DateUtils.DAY_IN_MILLIS
-import android.text.format.DateUtils.HOUR_IN_MILLIS
 import androidx.lifecycle.LiveData
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.Movie
 import com.example.atommovielisting.utilities.LogUtils.log
 import com.example.atommovielisting.network.NetworkDataSource
 import com.example.atommovielisting.utilities.AppExecutors
@@ -79,7 +78,7 @@ class Repository private constructor(
         }
     }
 
-    val allEntries: LiveData<List<FeedEntry>>
+    val allEntries: LiveData<List<Movie>>
         get() {
             initializeEntries()
             return mDao.getAllEntries()

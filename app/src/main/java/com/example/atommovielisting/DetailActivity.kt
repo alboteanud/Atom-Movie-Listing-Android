@@ -42,8 +42,8 @@ class DetailActivity : AppCompatActivity() {
             // using a fragment transaction.
             val fragment = DetailFragment().apply {
                 arguments = Bundle().apply {
-                    putString(DetailFragment.ARG_ITEM_ID,
-                            intent.getStringExtra(DetailFragment.ARG_ITEM_ID))
+                    putInt(DetailFragment.ARG_ITEM_ID,
+                            intent.getIntExtra(DetailFragment.ARG_ITEM_ID, 0))
                 }
             }
 

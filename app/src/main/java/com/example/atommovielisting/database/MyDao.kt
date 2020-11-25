@@ -2,20 +2,20 @@ package com.example.atommovielisting.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.atommovielisting.model.FeedEntry
+import com.example.atommovielisting.model.Movie
 import java.util.*
 
 @Dao
 interface MyDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertEntries(users: List<FeedEntry>)
+    fun insertEntries(users: List<Movie>)
 
-    @Query("SELECT * FROM movies")
-    fun getAllEntries(): LiveData<List<FeedEntry>>
+    @Query("SELECT * FROM movies ORDER BY popularity DESC")
+    fun getAllEntries(): LiveData<List<Movie>>
 
     @Delete
-    fun deleteAllEntries(entries: List<FeedEntry>)
+    fun deleteAllEntries(entries: List<Movie>)
 
     @Query("SELECT COUNT(*) FROM movies")
     fun countAllEntries(): Int

@@ -26,7 +26,6 @@ object InjectorUtils {
         // This call to provide repository is necessary if the app starts from a service - in this
 // case the repository will not exist unless it is specifically created.
         provideRepository(context.applicationContext)
-//        val executors = AppExecutors.instance
         return NetworkDataSource.getInstance(context.applicationContext)
     }
 
@@ -34,7 +33,7 @@ object InjectorUtils {
 //        RepositoryWeather repository = provideRepository(context.getApplicationContext());
 //        return new DetailViewModelFactory(repository, date);
 //    }
-    fun provideMainActivityViewModelFactory(context: Context): ViewModelFactory {
+    fun provideListActivityViewModelFactory(context: Context): ViewModelFactory {
         val repository =
                 provideRepository(context.applicationContext)
         return ViewModelFactory(repository)

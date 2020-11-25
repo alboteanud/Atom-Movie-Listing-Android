@@ -47,6 +47,7 @@ ext.arch_version = '2.2.0'
 ext.junit_version = '4.13.1'
 ext.support_test_version = '1.2.0'
 ext.glide_version = '4.11.0'
+ext.room_version = '2.2.5'
 
 dependencies {
 
@@ -55,9 +56,10 @@ dependencies {
     implementation "com.google.android.material:material:1.2.1"
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
-    implementation "androidx.room:room-runtime:2.2.5"
-    annotationProcessor "androidx.room:room-compiler:2.2.5"
-    kapt "androidx.room:room-compiler:2.2.5"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     implementation "androidx.work:work-runtime-ktx:$work_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$arch_version"
@@ -70,7 +72,10 @@ dependencies {
 
     implementation "com.github.bumptech.glide:glide:$glide_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
-    kapt "com.github.bumptech.glide:compiler:$glide_version"
+    implementation ("com.github.bumptech.glide:recyclerview-integration:$glide_version") {
+        // Excludes the support library because it's already included by Glide.
+        transitive = false
+    }
 
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
