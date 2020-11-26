@@ -13,7 +13,8 @@ class Movie(
     val poster_path: String?,
     val overview: String?,
     val popularity: Double?,
-    val releaseDate: Date?
+    val releaseDate: Date?,
+    val page: Int?
 //    @Ignore val picture: Bitmap?
 )
 

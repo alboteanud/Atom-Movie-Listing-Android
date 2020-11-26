@@ -23,4 +23,7 @@ interface MyDao {
 
     @Query("DELETE FROM movies WHERE releaseDate < :oldDate")
     fun deleteOldEntries(oldDate: Date)
+
+    @Query("SELECT * FROM movies ORDER BY popularity ASC LIMIT 1")
+    fun getLastEntry(): Movie?
 }

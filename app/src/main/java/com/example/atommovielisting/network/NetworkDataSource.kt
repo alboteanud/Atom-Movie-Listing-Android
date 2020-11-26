@@ -28,7 +28,8 @@ class NetworkDataSource private constructor(private val context: Context) {
     val entriy: LiveData<DetailsMovie>
         get() = mDownloadedEntry
 
-    fun downloadEntries(function: (success: List<Movie>?) -> Unit) {
+    fun downloadEntries(pageNumber: Int = 1, function: (success: List<Movie>?) -> Unit) {
+        val url =  getMoviesDownloadUrl(pageNumber)
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null, { response ->
 //                    val text = "Response: %s".format(response.toString())
@@ -54,6 +55,11 @@ class NetworkDataSource private constructor(private val context: Context) {
         )
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest)
     }
+
+    private fun getMoviesDownloadUrl(pageNumber: Int): String {
+        return "https://api.themoviedb.org/3/movie/popular?api_key=8700e0b55b9438b27963771c2aff54f5&&page=$pageNumber"
+    }
+
     fun downloadEntry(movieId: Int, function: (success: DetailsMovie?) -> Unit) {
         val entryUrl = getEntryEndpointUrl(context, movieId)
         val jsonObjectRequest = JsonObjectRequest(
@@ -84,7 +90,7 @@ class NetworkDataSource private constructor(private val context: Context) {
 
 
     companion object {
-        private val url = "https://api.themoviedb.org/3/movie/popular?api_key=8700e0b55b9438b27963771c2aff54f5"
+
         private val LOG_TAG = NetworkDataSource::class.java.simpleName
         private val LOCK = Any()
         private var sInstance: NetworkDataSource? = null

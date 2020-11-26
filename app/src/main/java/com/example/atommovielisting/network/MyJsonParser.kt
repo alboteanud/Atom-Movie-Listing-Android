@@ -47,11 +47,13 @@ internal class MyJsonParser {
 
         @Throws(JSONException::class)
         private fun fromJsonEntries(entriesJson: JSONObject): List<Movie> {
+            val pageNumber = entriesJson.getInt("page")
             val jsonResultArray = entriesJson.getJSONArray(RESULTS)
             val entries = mutableListOf<Movie>()
             for (i in 0 until jsonResultArray.length()) {
                 val entryJson = jsonResultArray.getJSONObject(i)
-                val entry = fromJsonToEntry(entryJson)
+
+                val entry = fromJsonToEntry(entryJson, pageNumber)
                 entries.add(i, entry)
             }
             return entries.toList()
@@ -59,7 +61,7 @@ internal class MyJsonParser {
 
 
         @Throws(JSONException::class)
-        private fun fromJsonToEntry(entryJson: JSONObject): Movie {
+        private fun fromJsonToEntry(entryJson: JSONObject, pageNumber: Int): Movie {
             val id = entryJson.getInt("id")
             val title = entryJson.getString("title")
             val overview = entryJson.getString("overview")
@@ -69,7 +71,7 @@ internal class MyJsonParser {
             val releaseDateString = entryJson.getString("release_date")
 //            val releaseDate = LocalDate.parse(releaseDateString, DateTimeFormatter.ISO_DATE)
            val releaseDate = java.sql.Date.valueOf(releaseDateString)
-            return Movie(id, title, posterPath, overview, popularity, releaseDate)
+            return Movie(id, title, posterPath, overview, popularity, releaseDate, pageNumber)
 
         }
     }

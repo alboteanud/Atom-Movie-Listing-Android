@@ -5,4 +5,5 @@
     <string name="image_description">movie poster image</string>
     <string name="delete_all">Delete all</string>
     <string name="add_more_movies">Add more movies</string>
+    <string name="delete_all_movies">Delete all movies?</string>
 </resources>

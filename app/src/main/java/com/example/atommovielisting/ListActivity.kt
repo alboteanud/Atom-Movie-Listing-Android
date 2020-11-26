@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.NestedScrollView
@@ -95,8 +97,7 @@ class ListActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.delete_all -> {
-                // todo: show warning
-                myViewModel.deleteAllEntries()
+                alertDelete()
                 true
             }
             R.id.add_more_movies -> {
@@ -105,6 +106,22 @@ class ListActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun alertDelete(){
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete Alert")
+        builder.setMessage(R.string.delete_all_movies)
+
+        builder.setPositiveButton("Delete") { dialog, which ->
+            Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+            myViewModel.deleteAllEntries()
+        }
+
+        builder.setNegativeButton(android.R.string.cancel) { dialog, which ->
+
+        }
+        builder.show()
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ListActivity, private val twoPane: Boolean) :

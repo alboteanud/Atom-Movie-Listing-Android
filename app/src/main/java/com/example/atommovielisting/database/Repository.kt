@@ -2,7 +2,6 @@ package com.example.atommovielisting.database
 
 import android.text.format.DateUtils.DAY_IN_MILLIS
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.atommovielisting.model.Movie
 import com.example.atommovielisting.utilities.LogUtils.log
 import com.example.atommovielisting.network.NetworkDataSource
@@ -80,10 +79,16 @@ class Repository private constructor(
     @Synchronized
     fun loadNewEntries() {
         mExecutors.diskIO().execute {
-            mNetworkDataSource.downloadEntries { firstEntry ->
-
+            val nextPageNumber = getLastDownloadedPage() + 1
+            mNetworkDataSource.downloadEntries(nextPageNumber) { firstEntry ->
             }
         }
+    }
+
+    private fun getLastDownloadedPage(): Int{
+        val pageNumber =  mDao.getLastEntry()?.page
+        if (pageNumber!=null) return pageNumber
+        return 0
     }
 
     val allEntries: LiveData<List<Movie>>

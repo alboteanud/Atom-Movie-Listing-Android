@@ -5,4 +5,5 @@
     <string name="image_description">imagen del cartel de la película</string>
     <string name="delete_all">Delete all</string>
     <string name="add_more_movies">Add more movies</string>
+    <string name="delete_all_movies">¿Eliminar todas las películas?</string>
 </resources>
