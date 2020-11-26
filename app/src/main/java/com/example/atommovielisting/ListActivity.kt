@@ -2,9 +2,7 @@ package com.example.atommovielisting
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +17,7 @@ import com.example.atommovielisting.ui.MyViewModel
 import com.example.atommovielisting.utilities.InjectorUtils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+
 
 /**
  * An activity representing a list of Pings. This activity
@@ -47,7 +46,7 @@ class ListActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.title = title
         toolbar.setLogo(R.mipmap.ic_launcher)
-        // todo setup a custom toolbar
+        // todo: setup a custom toolbar
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -85,6 +84,27 @@ class ListActivity : AppCompatActivity() {
         mAdapter = SimpleItemRecyclerViewAdapter(this, twoPane)
         recyclerView.adapter = mAdapter
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.list_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.delete_all -> {
+                // todo: show warning
+                myViewModel.deleteAllEntries()
+                true
+            }
+            R.id.add_more_movies -> {
+                myViewModel.loadNewEntries()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: ListActivity, private val twoPane: Boolean) :

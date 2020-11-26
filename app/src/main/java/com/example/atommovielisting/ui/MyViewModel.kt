@@ -4,9 +4,17 @@ import androidx.lifecycle.*
 import com.example.atommovielisting.database.Repository
 import com.example.atommovielisting.model.Movie
 
-class MyViewModel internal constructor(repository: Repository) : ViewModel(),
+class MyViewModel internal constructor(val repository: Repository) : ViewModel(),
         LifecycleObserver {
     val entries: LiveData<List<Movie>> = repository.allEntries
+
+    fun loadNewEntries () {
+        repository.loadNewEntries()
+    }
+
+    fun deleteAllEntries(){
+        repository.deleteAllEntries()
+    }
 
 //    private val mutableTimestamp: MutableLiveData<Long> = MutableLiveData()
 
@@ -20,3 +28,4 @@ class MyViewModel internal constructor(repository: Repository) : ViewModel(),
 //            }
 
 }
+

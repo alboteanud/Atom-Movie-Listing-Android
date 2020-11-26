@@ -2,6 +2,7 @@ package com.example.atommovielisting.database
 
 import android.text.format.DateUtils.DAY_IN_MILLIS
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.atommovielisting.model.Movie
 import com.example.atommovielisting.utilities.LogUtils.log
 import com.example.atommovielisting.network.NetworkDataSource
@@ -71,9 +72,16 @@ class Repository private constructor(
         mExecutors.diskIO().execute {
             if (!isFetchEntriesNeeded) return@execute
             mNetworkDataSource.downloadEntries { firstEntry ->
-                if (firstEntry != null){
-//                    initializeWebcamData(firstEntry)
-                }
+
+            }
+        }
+    }
+
+    @Synchronized
+    fun loadNewEntries() {
+        mExecutors.diskIO().execute {
+            mNetworkDataSource.downloadEntries { firstEntry ->
+
             }
         }
     }
@@ -88,6 +96,13 @@ class Repository private constructor(
         val oldMills = currentTimeMillis() - OLD_DAYS_COUNT * DAY_IN_MILLIS
         val oldDate = Date(oldMills)
         mDao.deleteOldEntries(oldDate)
+    }
+
+    fun deleteAllEntries() {
+        mExecutors.diskIO().execute {
+            mDao.deleteAllEntries()
+        }
+
     }
 
     companion object {

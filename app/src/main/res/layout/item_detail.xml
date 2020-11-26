@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             tools:text= "Genres"
             android:layout_gravity="center"
-            style="SubheadWhiteTextStyle"
+            android:textColor="@color/white"
             android:id="@+id/genresTextView"/>
 
     </FrameLayout>
