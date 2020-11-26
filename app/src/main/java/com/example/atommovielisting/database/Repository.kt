@@ -43,9 +43,7 @@ class Repository private constructor(
     }
 
     /**
-     * Checks if there are enough days of future weather for the app to display all the needed data.
-     *
-     * @return Whether a fetch is needed
+     * Checks if there are enough entries for the app to display all the needed data.
      */
     private val isFetchEntriesNeeded: Boolean
         get() {
@@ -65,9 +63,7 @@ class Repository private constructor(
         // performed, we have nothing to do in this method.
         if (initializedEntries) return
         initializedEntries = true
-
 //        mNetworkDataSource.scheduleFetchEntries()
-
         mExecutors.diskIO().execute {
             if (!isFetchEntriesNeeded) return@execute
             mNetworkDataSource.downloadEntries { firstEntry ->
@@ -107,11 +103,10 @@ class Repository private constructor(
         mExecutors.diskIO().execute {
             mDao.deleteAllEntries()
         }
-
     }
 
     companion object {
-        private val OLD_DAYS_COUNT = 30
+        private const val OLD_DAYS_COUNT = 30
         private val LOCK = Any()
         private var sInstance: Repository? = null
         private val NUM_MIN_ENTRIES_COUNTS = if (inTestMode) 1 else 20
@@ -124,11 +119,7 @@ class Repository private constructor(
             log("Getting the repository")
             if (sInstance == null) {
                 synchronized(LOCK) {
-                    sInstance =
-                            Repository(
-                                    myDao, networkDataSource,
-                                    executors
-                            )
+                    sInstance = Repository(myDao, networkDataSource, executors)
                     log("Made new repository")
                 }
             }
